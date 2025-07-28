@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Node Template API
+  version: 1.0.0
+  description: API for authentication and user management
+
+servers:
+  - url: http://localhost:3000/v1
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register a new user
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password]
+              properties:
+                name:
+                  type: string
+                  example: alice
+                email:
+                  type: string
+                  format: email
+                  example: alice@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: alice123
+      responses:
+        '201':
+          description: User registered successfully
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user and return tokens
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: gwenstacy@example.com
+                password:
+                  type: string
+                  format: password
+                  example: gwen1234
+      responses:
+        '200':
+          description: Access and refresh tokens returned
+
+  /auth/refresh-tokens:
+    post:
+      tags:
+        - Auth
+      summary: Refresh access token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: New access token returned
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout user and invalidate refresh token
+      operationId: logoutUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '204':
+          description: Logged out successfully
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Auth
+      summary: Send password reset email
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Password reset email sent
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Auth
+      summary: Reset password using token
+      operationId: resetPassword
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+                  example: harrypotter10
+      responses:
+        '200':
+          description: Password has been reset
+
+  /auth/send-verification-email:
+    post:
+      tags:
+        - Auth
+      summary: Send verification email
+      operationId: sendVerificationEmail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Verification email sent
+
+  /auth/verify-email:
+    post:
+      tags:
+        - Auth
+      summary: Verify user email
+      operationId: verifyEmail
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: string
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Email verified successfully
+
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Create a new user (Admin only)
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: User created successfully
+
+    get:
+      tags:
+        - Users
+      summary: Get list of users (Admin only)
+      operationId: getUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          schema:
+            type: string
+            example: name:asc
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of users returned
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get a single user by ID
+      operationId: getUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User data returned
+
+    patch:
+      tags:
+        - Users
+      summary: Update a user by ID
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User updated
+
+    delete:
+      tags:
+        - Users
+      summary: Delete a user by ID
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,6 +1,23 @@
 const allRoles = {
-  user: [],
-  admin: ['getUsers', 'manageUsers'],
+  user: [
+    'createBooking',
+    'updateBooking',
+    'cancelBooking',
+    'viewServices',
+    'addReview',
+    'updateOwnUserProfile',
+    'viewOwnBookings',
+  ],
+  artist: ['manageService', 'manageBookings', 'viewReviews', 'viewServices', 'updateOwnArtistProfile', 'viewOwnBookings'],
+  admin: [
+    'getUsers',
+    'manageUsers',
+    'manageServices',
+    'manageAllBookings',
+    'viewAnalytics',
+    'viewAllProfiles',
+    'deleteReview',
+  ],
 };
 
 const roles = Object.keys(allRoles);
