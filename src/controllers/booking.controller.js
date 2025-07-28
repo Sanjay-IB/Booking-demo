@@ -12,7 +12,7 @@ const createBooking = catchAsync(async (req, res) => {
 
   const booking = await BookingService.createBooking({
     client: req.user.id,
-    artist: service.user,
+    artist: service.artist,
     service: service._id,
     bookingDate,
     timeSlot,
